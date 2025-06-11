@@ -57,29 +57,5 @@ func main() {
 	// offer routes
 	router.POST("/offer/mailgun", offerHandler.ReceiveOffer)
 
-	// //send a test email
-	// apikey := os.Getenv("MAILGUN_API_KEY")
-	// id, err := SendSimpleMessage("sandboxc4c89b92a012423a819e1762a284ab33.mailgun.org", apikey)
-	// fmt.Println(id)
-	// fmt.Println(err)
-
 	log.Fatal(router.Run(":8080"))
 }
-
-// func SendSimpleMessage(domain, apiKey string) (string, error) {
-// 	mg := mailgun.NewMailgun(domain, apiKey)
-// 	//When you have an EU-domain, you must specify the endpoint:
-// 	// mg.SetAPIBase("https://api.eu.mailgun.net")
-// 	m := mg.NewMessage(
-// 		"Mailgun Sandbox <postmaster@sandboxc4c89b92a012423a819e1762a284ab33.mailgun.org>",
-// 		"Hello Keyur Bilgi",
-// 		"Congratulations Keyur Bilgi, you just sent an email with Mailgun! You are truly awesome!",
-// 		"Keyur Bilgi <platinumpizza29@gmail.com>",
-// 	)
-
-// 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
-// 	defer cancel()
-
-// 	_, id, err := mg.Send(ctx, m)
-// 	return id, err
-// }
