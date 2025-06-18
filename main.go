@@ -9,22 +9,21 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func main() {
 	router := gin.Default()
 
 	// get the .env file
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	log.Fatal("Error loading .env file")
+	// }
 
 	DBNAME := os.Getenv("DBNAME")
 	DBURI := os.Getenv("DATABASE_URL")
 
-	err = db.ConnectDB(DBURI, DBNAME)
+	err := db.ConnectDB(DBURI, DBNAME)
 	if err != nil {
 		log.Fatal("Error connecting to database")
 	}
