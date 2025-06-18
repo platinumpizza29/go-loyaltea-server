@@ -7,8 +7,8 @@ import (
 	"log"
 	"time"
 
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 var (
@@ -26,7 +26,7 @@ func ConnectDB(uri string, dbName string) error {
 	clientOptions := options.Client().ApplyURI(uri)
 
 	// Connect to MongoDB
-	client, err := mongo.Connect(ctx, clientOptions)
+	client, err := mongo.Connect(clientOptions)
 	if err != nil {
 		log.Printf("Failed to connect to MongoDB: %v", err)
 		return err
