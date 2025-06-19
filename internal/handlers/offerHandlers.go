@@ -98,3 +98,8 @@ func (h *OfferHandler) ReceiveOffer(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Offer stored and user subscribed to Mailchimp successfully"})
 }
+
+// Add a simple GET endpoint to respond to Mailchimp webhook verification
+func (h *OfferHandler) VerifyWebhook(c *gin.Context) {
+	c.String(http.StatusOK, "Webhook endpoint verified")
+}

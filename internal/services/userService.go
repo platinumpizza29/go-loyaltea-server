@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"time"
 
+	"loyaltea-server/internal/db"
 	"loyaltea-server/internal/models"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -21,11 +22,11 @@ var (
 
 // UserService handles business logic for user operations
 type UserService struct {
-	userModel *models.UserModel
+	userModel *db.UserModel
 }
 
 // NewUserService creates a new UserService instance
-func NewUserService(userModel *models.UserModel) *UserService {
+func NewUserService(userModel *db.UserModel) *UserService {
 	return &UserService{
 		userModel: userModel,
 	}
@@ -54,6 +55,7 @@ func (s *UserService) RegisterUser(email, password, name string) (*models.User, 
 
 	// Create new user
 	user := &models.User{
+		ID:       primitive.NewObjectID().Hex(),
 		Email:    email,
 		Password: password,
 		Name:     name,
@@ -88,12 +90,7 @@ func (s *UserService) LoginUser(email, password string) (*models.User, error) {
 
 // GetUserByID retrieves a user by ID
 func (s *UserService) GetUserByID(id string) (*models.User, error) {
-	objectID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-
-	user, err := s.userModel.FindByID(context.TODO(), objectID)
+	user, err := s.userModel.FindByID(context.TODO(), id)
 	if err != nil {
 		return nil, err
 	}
@@ -106,13 +103,8 @@ func (s *UserService) GetUserByID(id string) (*models.User, error) {
 
 // UpdateUser updates user information
 func (s *UserService) UpdateUser(id string, email, name string) (*models.User, error) {
-	objectID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-
 	// Get existing user
-	user, err := s.userModel.FindByID(context.TODO(), objectID)
+	user, err := s.userModel.FindByID(context.TODO(), id)
 	if err != nil {
 		return nil, err
 	}
@@ -151,13 +143,8 @@ func (s *UserService) UpdateUser(id string, email, name string) (*models.User, e
 
 // DeleteUser deletes a user
 func (s *UserService) DeleteUser(id string) error {
-	objectID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
-
 	// Check if user exists
-	user, err := s.userModel.FindByID(context.TODO(), objectID)
+	user, err := s.userModel.FindByID(context.TODO(), id)
 	if err != nil {
 		return err
 	}
@@ -165,7 +152,7 @@ func (s *UserService) DeleteUser(id string) error {
 		return ErrUserNotFound
 	}
 
-	return s.userModel.Delete(context.TODO(), objectID)
+	return s.userModel.Delete(context.TODO(), id)
 }
 
 // isValidEmail validates email format

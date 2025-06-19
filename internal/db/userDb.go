@@ -2,12 +2,12 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"loyaltea-server/internal/models"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -38,13 +38,12 @@ func (m *UserModel) Create(ctx context.Context, user *models.User) error {
 	user.Password = string(hashedPassword)
 
 	// Insert the user
-	result, err := m.collection.InsertOne(ctx, user)
+	_, err = m.collection.InsertOne(ctx, user)
 	if err != nil {
+		fmt.Println("Error inserting user:", err)
 		return err
 	}
 
-	// Set the ID from the inserted document
-	user.ID = result.InsertedID.(primitive.ObjectID)
 	return nil
 }
 
@@ -62,7 +61,7 @@ func (m *UserModel) FindByEmail(ctx context.Context, email string) (*models.User
 }
 
 // FindByID finds a user by ID
-func (m *UserModel) FindByID(ctx context.Context, id primitive.ObjectID) (*models.User, error) {
+func (m *UserModel) FindByID(ctx context.Context, id string) (*models.User, error) {
 	var user models.User
 	err := m.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&user)
 	if err != nil {
@@ -95,7 +94,7 @@ func (m *UserModel) Update(ctx context.Context, user *models.User) error {
 }
 
 // Delete deletes a user
-func (m *UserModel) Delete(ctx context.Context, id primitive.ObjectID) error {
+func (m *UserModel) Delete(ctx context.Context, id string) error {
 	_, err := m.collection.DeleteOne(ctx, bson.M{"_id": id})
 	return err
 }
