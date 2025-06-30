@@ -4,7 +4,6 @@ import (
 	"log"
 	"loyaltea-server/internal/db"
 	"loyaltea-server/internal/handlers"
-	"loyaltea-server/internal/models"
 	"loyaltea-server/internal/services"
 	"os"
 
@@ -50,13 +49,17 @@ func main() {
 		userRoutes.DELETE("/:id", userHandler.DeleteUser)
 	}
 
-	offerModel := models.NewOfferModel(db.Database)
+	offerModel := db.NewOfferModel(db.Database)
 	offerService := services.NewOfferService(offerModel)
 	offerHandler := handlers.NewOfferHandler(offerService)
 
-	// offer routes
-	router.POST("/offer/mailchimp", offerHandler.ReceiveOffer)
-	router.GET("/offer/mailchimp", offerHandler.VerifyWebhook)
+	offerRoutes := router.Group("/offer")
+	{
+		offerRoutes.GET("/", offerHandler.GetOffers)
+		offerRoutes.GET("/:id", offerHandler.GetOfferByID)
+	}
+
+	router.GET("/offer/mailgun", offerHandler.VerifyWebhook)
 
 	log.Fatal(router.Run(":8080"))
 }
