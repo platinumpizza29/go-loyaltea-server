@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 type OfferHandler struct {
@@ -16,22 +17,6 @@ func NewOfferHandler(offerService *services.OfferService) *OfferHandler {
 	return &OfferHandler{
 		offerService: offerService,
 	}
-}
-
-// MailgunOfferRequest represents the expected POST payload for Mailgun
-// (expects JSON)
-type MailgunOfferRequest struct {
-	SenderEmail string   `json:"sender_email" binding:"required,email"`
-	Subject     string   `json:"subject"`
-	Body        string   `json:"body"`
-	Brand       string   `json:"brand"`
-	Source      string   `json:"source"`
-	Tags        []string `json:"tags"`
-}
-
-// Add a simple GET endpoint to respond to Mailchimp webhook verification
-func (h *OfferHandler) VerifyWebhook(c *gin.Context) {
-	c.String(http.StatusOK, "Webhook endpoint verified")
 }
 
 // GetOffers handles GET requests and returns all offers
@@ -50,6 +35,11 @@ func (h *OfferHandler) GetOfferByID(c *gin.Context) {
 	id := c.Param("id")
 	offer, err := h.offerService.GetOfferByID(c.Request.Context(), id)
 	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Offer not found"})
+			return
+		}
+		log.Println("Failed to get offer", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get offer"})
 		return
 	}

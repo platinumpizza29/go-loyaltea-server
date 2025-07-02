@@ -39,6 +39,14 @@ func main() {
 	userService := services.NewUserService(userModel)
 	userHandler := handlers.NewUserHandler(userService)
 
+	offerModel := db.NewOfferModel(db.Database)
+	offerService := services.NewOfferService(offerModel)
+	offerHandler := handlers.NewOfferHandler(offerService)
+
+	favModel := db.NewFavoriteModel(db.Database)
+	favService := services.NewFavoriteService(favModel)
+	favHandler := handlers.NewFavoriteHandler(favService)
+
 	// user routes
 	userRoutes := router.Group("/user")
 	{
@@ -49,17 +57,21 @@ func main() {
 		userRoutes.DELETE("/:id", userHandler.DeleteUser)
 	}
 
-	offerModel := db.NewOfferModel(db.Database)
-	offerService := services.NewOfferService(offerModel)
-	offerHandler := handlers.NewOfferHandler(offerService)
-
+	// offer routes
 	offerRoutes := router.Group("/offer")
 	{
 		offerRoutes.GET("/", offerHandler.GetOffers)
 		offerRoutes.GET("/:id", offerHandler.GetOfferByID)
 	}
 
-	router.GET("/offer/mailgun", offerHandler.VerifyWebhook)
+	// fav routes
+	favRoutes := router.Group("/fav")
+	{
+		favRoutes.POST("/", favHandler.CreateFav)
+		favRoutes.GET("/:id", favHandler.GetFav)
+		favRoutes.PUT("/:id", favHandler.UpdateFav)
+		favRoutes.DELETE("/:id", favHandler.DeleteFav)
+	}
 
 	log.Fatal(router.Run(":8080"))
 }
