@@ -47,6 +47,10 @@ func main() {
 	favService := services.NewFavoriteService(favModel)
 	favHandler := handlers.NewFavoriteHandler(favService)
 
+	plannerModel := db.NewPlannerStruct(db.Database)
+	plannerService := services.NewPlannerService(plannerModel)
+	plannerHandler := handlers.NewPlannerHandler(plannerService)
+
 	// user routes
 	userRoutes := router.Group("/user")
 	{
@@ -71,6 +75,15 @@ func main() {
 		favRoutes.GET("/:id", favHandler.GetFav)
 		favRoutes.PUT("/:id", favHandler.UpdateFav)
 		favRoutes.DELETE("/:id", favHandler.DeleteFav)
+	}
+
+	// planner routes
+	plannerRoutes := router.Group("/planner")
+	{
+		plannerRoutes.POST("/", plannerHandler.CreateStop)
+		plannerRoutes.GET("/:id", plannerHandler.GetStopsByUserID)
+		plannerRoutes.PUT("/:id", plannerHandler.UpdateStop)
+		plannerRoutes.DELETE("/:id", plannerHandler.DeleteStop)
 	}
 
 	log.Fatal(router.Run(":8080"))
