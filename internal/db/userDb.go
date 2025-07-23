@@ -31,11 +31,12 @@ func (m *UserModel) Create(ctx context.Context, user *models.User) error {
 		return err
 	}
 
-	// Set timestamps
+	// Set timestamps and initialize points
 	now := time.Now()
 	user.CreatedAt = now
 	user.UpdatedAt = now
 	user.Password = string(hashedPassword)
+	user.TotalPoints = 0
 
 	// Insert the user
 	_, err = m.collection.InsertOne(ctx, user)
@@ -79,9 +80,10 @@ func (m *UserModel) Update(ctx context.Context, user *models.User) error {
 
 	update := bson.M{
 		"$set": bson.M{
-			"name":       user.Name,
-			"email":      user.Email,
-			"updated_at": user.UpdatedAt,
+			"name":         user.Name,
+			"email":        user.Email,
+			"total_points": user.TotalPoints,
+			"updated_at":   user.UpdatedAt,
 		},
 	}
 
@@ -103,4 +105,27 @@ func (m *UserModel) Delete(ctx context.Context, id string) error {
 func (m *UserModel) VerifyPassword(user *models.User, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	return err == nil
+}
+
+// AddPoints adds points to a user's total
+func (m *UserModel) AddPoints(ctx context.Context, userID string, points int) error {
+	_, err := m.collection.UpdateOne(
+		ctx,
+		bson.M{"_id": userID},
+		bson.M{
+			"$inc": bson.M{"total_points": points},
+			"$set": bson.M{"updated_at": time.Now()},
+		},
+	)
+	return err
+}
+
+// GetUserPoints gets a user's total points
+func (m *UserModel) GetUserPoints(ctx context.Context, userID string) (int, error) {
+	var user models.User
+	err := m.collection.FindOne(ctx, bson.M{"_id": userID}).Decode(&user)
+	if err != nil {
+		return 0, err
+	}
+	return user.TotalPoints, nil
 }

@@ -51,6 +51,15 @@ func main() {
 	plannerService := services.NewPlannerService(plannerModel)
 	plannerHandler := handlers.NewPlannerHandler(plannerService)
 
+	// shop and shopping plan models/services/handlers
+	shopModel := db.NewShopModel(db.Database)
+	shopService := services.NewShopService(shopModel)
+	shopHandler := handlers.NewShopHandler(shopService)
+
+	shoppingPlanModel := db.NewShoppingPlanModel(db.Database)
+	shoppingPlanService := services.NewShoppingPlanService(shoppingPlanModel, userModel, shopModel)
+	shoppingPlanHandler := handlers.NewShoppingPlanHandler(shoppingPlanService)
+
 	// user routes
 	userRoutes := router.Group("/user")
 	{
@@ -84,6 +93,36 @@ func main() {
 		plannerRoutes.GET("/:id", plannerHandler.GetStopsByUserID)
 		plannerRoutes.PUT("/:id", plannerHandler.UpdateStop)
 		plannerRoutes.DELETE("/:id", plannerHandler.DeleteStop)
+	}
+
+	// shop routes
+	shopRoutes := router.Group("/shops")
+	{
+		shopRoutes.GET("/", shopHandler.GetShops)
+		shopRoutes.GET("/nearby", shopHandler.GetNearbyShops)
+		shopRoutes.GET("/categories", shopHandler.GetCategories)
+		shopRoutes.GET("/brand/:brand", shopHandler.GetShopsByBrand)
+		shopRoutes.GET("/:id", shopHandler.GetShopByID)
+		shopRoutes.POST("/", shopHandler.CreateShop)      // Admin only
+		shopRoutes.PUT("/:id", shopHandler.UpdateShop)    // Admin only
+		shopRoutes.DELETE("/:id", shopHandler.DeleteShop) // Admin only
+	}
+
+	// shopping plan routes
+	planRoutes := router.Group("/shopping-plans")
+	{
+		planRoutes.POST("/", shoppingPlanHandler.CreatePlan)
+		planRoutes.GET("/:id", shoppingPlanHandler.GetPlanByID)
+		planRoutes.PUT("/:id", shoppingPlanHandler.UpdatePlan)
+		planRoutes.DELETE("/:id", shoppingPlanHandler.DeletePlan)
+		planRoutes.GET("/:id/progress", shoppingPlanHandler.GetPlanProgress)
+		planRoutes.PUT("/:id/visit/:shopId", shoppingPlanHandler.MarkShopVisited)
+		planRoutes.POST("/:id/shops", shoppingPlanHandler.AddShopToPlan)
+		planRoutes.DELETE("/:id/shops/:shopId", shoppingPlanHandler.RemoveShopFromPlan)
+		planRoutes.GET("/user/:id", shoppingPlanHandler.GetUserPlans)
+		planRoutes.GET("/user/:id/active", shoppingPlanHandler.GetActivePlans)
+		planRoutes.GET("/user/:id/completed", shoppingPlanHandler.GetCompletedPlans)
+		planRoutes.GET("/user/:id/stats", shoppingPlanHandler.GetUserStats)
 	}
 
 	log.Fatal(router.Run(":8080"))
