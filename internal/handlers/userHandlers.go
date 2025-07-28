@@ -30,7 +30,18 @@ type LoginRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
-// Register handles user registration
+// Register godoc
+// @Summary      Register a new user
+// @Description  Creates a new user account
+// @Tags         user
+// @Accept       json
+// @Produce      json
+// @Param        user  body  handlers.RegisterRequest  true  "User registration payload"
+// @Success      201   {object}  map[string]interface{}
+// @Failure      400   {object}  map[string]string
+// @Failure      409   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Router       /user/register [post]
 func (h *UserHandler) Register(c *gin.Context) {
 	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -71,7 +82,18 @@ func (h *UserHandler) Register(c *gin.Context) {
 	})
 }
 
-// Login handles user login
+// Login godoc
+// @Summary      Login a user
+// @Description  Authenticates user and returns JWT
+// @Tags         user
+// @Accept       json
+// @Produce      json
+// @Param        credentials  body  handlers.LoginRequest  true  "User login payload"
+// @Success      200   {object}  map[string]interface{}
+// @Failure      400   {object}  map[string]string
+// @Failure      401   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Router       /user/login [post]
 func (h *UserHandler) Login(c *gin.Context) {
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -107,7 +129,16 @@ func (h *UserHandler) Login(c *gin.Context) {
 	})
 }
 
-// GetUser handles getting user by ID
+// GetUser godoc
+// @Summary      Get user by ID
+// @Description  Retrieves user information
+// @Tags         user
+// @Produce      json
+// @Param        id   path      string  true  "User ID"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      404  {object}  map[string]string
+// @Failure      500  {object}  map[string]string
+// @Router       /user/{id} [get]
 func (h *UserHandler) GetUser(c *gin.Context) {
 	id := c.Param("id")
 	user, err := h.userService.GetUserByID(id)
@@ -129,7 +160,20 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 	})
 }
 
-// UpdateUser handles updating user information
+// UpdateUser godoc
+// @Summary      Update user
+// @Description  Updates user name and email
+// @Tags         user
+// @Accept       json
+// @Produce      json
+// @Param        id    path      string  true  "User ID"
+// @Param        user  body      object  true  "User update payload"
+// @Success      200   {object}  map[string]interface{}
+// @Failure      400   {object}  map[string]string
+// @Failure      404   {object}  map[string]string
+// @Failure      409   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Router       /user/{id} [put]
 func (h *UserHandler) UpdateUser(c *gin.Context) {
 	id := c.Param("id")
 	var req struct {
@@ -167,7 +211,16 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 	})
 }
 
-// DeleteUser handles user deletion
+// DeleteUser godoc
+// @Summary      Delete user
+// @Description  Deletes a user by ID
+// @Tags         user
+// @Produce      json
+// @Param        id   path      string  true  "User ID"
+// @Success      200  {object}  map[string]string
+// @Failure      404  {object}  map[string]string
+// @Failure      500  {object}  map[string]string
+// @Router       /user/{id} [delete]
 func (h *UserHandler) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
 	err := h.userService.DeleteUser(id)

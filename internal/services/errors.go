@@ -30,12 +30,6 @@ var (
 	ErrUnauthorizedAccess   = errors.New("unauthorized access to plan")
 )
 
-// Planner service errors
-var (
-	ErrStopNotFound = errors.New("stop not found")
-	ErrInvalidStop  = errors.New("invalid stop data")
-)
-
 // General service errors
 var (
 	ErrInternalServer = errors.New("internal server error")

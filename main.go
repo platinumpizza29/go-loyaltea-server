@@ -1,3 +1,10 @@
+// @title LoyalTea API
+// @version 1.0
+// @description Backend API for the LoyalTea mobile app
+// @host localhost:8080
+// @BasePath /
+// @schemes http
+
 package main
 
 import (
@@ -9,10 +16,17 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+
+	docs "loyaltea-server/docs"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func main() {
 	router := gin.Default()
+	docs.SwaggerInfo.BasePath = "/"
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	//get the .env file
 	err := godotenv.Load()
@@ -46,10 +60,6 @@ func main() {
 	favModel := db.NewFavoriteModel(db.Database)
 	favService := services.NewFavoriteService(favModel)
 	favHandler := handlers.NewFavoriteHandler(favService)
-
-	plannerModel := db.NewPlannerStruct(db.Database)
-	plannerService := services.NewPlannerService(plannerModel)
-	plannerHandler := handlers.NewPlannerHandler(plannerService)
 
 	// shop and shopping plan models/services/handlers
 	shopModel := db.NewShopModel(db.Database)
@@ -86,15 +96,6 @@ func main() {
 		favRoutes.DELETE("/:id", favHandler.DeleteFav)
 	}
 
-	// planner routes
-	plannerRoutes := router.Group("/planner")
-	{
-		plannerRoutes.POST("/", plannerHandler.CreateStop)
-		plannerRoutes.GET("/:id", plannerHandler.GetStopsByUserID)
-		plannerRoutes.PUT("/:id", plannerHandler.UpdateStop)
-		plannerRoutes.DELETE("/:id", plannerHandler.DeleteStop)
-	}
-
 	// shop routes
 	shopRoutes := router.Group("/shops")
 	{
@@ -109,7 +110,7 @@ func main() {
 	}
 
 	// shopping plan routes
-	planRoutes := router.Group("/shopping-plans")
+	planRoutes := router.Group("/planner")
 	{
 		planRoutes.POST("/", shoppingPlanHandler.CreatePlan)
 		planRoutes.GET("/:id", shoppingPlanHandler.GetPlanByID)

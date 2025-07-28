@@ -376,38 +376,6 @@ user_id: <user_id_string>
 
 ---
 
-## Legacy Planner Endpoints
-
-### Create Stop (Legacy)
-- **POST** `/planner`
-- **Headers:** `user_id: <user_id>`
-- **Body:**
-```json
-{
-  "name": "Coffee Stop",
-  "address": "123 Main St",
-  "location": {
-    "type": "Point",
-    "coordinates": [-74.0060, 40.7128]
-  },
-  "points": 15
-}
-```
-
-### Get User Stops (Legacy)
-- **GET** `/planner/:id`
-- **Headers:** `user_id: <user_id>`
-
-### Update Stop (Legacy)
-- **PUT** `/planner/:id`
-- **Headers:** `user_id: <user_id>`
-
-### Delete Stop (Legacy)
-- **DELETE** `/planner/:id`
-- **Headers:** `user_id: <user_id>`
-
----
-
 ## Error Responses
 
 ### Common Error Codes

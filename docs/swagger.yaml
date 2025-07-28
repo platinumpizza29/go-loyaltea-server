@@ -1,0 +1,1056 @@
+basePath: /
+definitions:
+  gin.H:
+    additionalProperties: {}
+    type: object
+  handlers.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  handlers.RegisterRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 8
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  models.GeoPoint:
+    properties:
+      coordinates:
+        items:
+          type: number
+        type: array
+      type:
+        type: string
+    type: object
+  models.Offer:
+    properties:
+      brand:
+        description: 'Optional: Parsed brand like "Zara", "Starbucks"'
+        type: string
+      createdAt:
+        description: When this offer was received
+        type: string
+      ctas:
+        description: Call-to-action links
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      images:
+        description: Images from the email
+        items:
+          type: string
+        type: array
+      sender_email:
+        description: Email of the user who forwarded it
+        type: string
+      source:
+        description: e.g., "email"
+        type: string
+      subject:
+        description: Subject line of the email
+        type: string
+      tags:
+        description: 'Optional: e.g., ["discount", "clothing"]'
+        items:
+          type: string
+        type: array
+      text:
+        description: Plain text body
+        type: string
+    type: object
+  models.PlanStop:
+    properties:
+      is_visited:
+        type: boolean
+      points_earned:
+        type: integer
+      shop_id:
+        type: string
+      visited_at:
+        type: string
+    type: object
+  models.Shop:
+    properties:
+      address:
+        type: string
+      brand:
+        type: string
+      category:
+        description: e.g., "coffee", "clothing", "grocery"
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      location:
+        $ref: '#/definitions/models.GeoPoint'
+      name:
+        type: string
+      points_value:
+        description: Points awarded for visiting
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  models.ShoppingPlan:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      is_completed:
+        type: boolean
+      name:
+        description: e.g., "Weekend Shopping"
+        type: string
+      stops:
+        items:
+          $ref: '#/definitions/models.PlanStop'
+        type: array
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Backend API for the LoyalTea mobile app
+  title: LoyalTea API
+  version: "1.0"
+paths:
+  /offers:
+    get:
+      description: Retrieves a list of all available offers
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Offer'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all offers
+      tags:
+      - offers
+  /offers/{id}:
+    get:
+      description: Retrieves a single offer by its ID
+      parameters:
+      - description: Offer ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Offer'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get offer by ID
+      tags:
+      - offers
+  /shopping-plans:
+    post:
+      consumes:
+      - application/json
+      description: Create a new shopping plan for a user
+      parameters:
+      - description: User ID
+        in: header
+        name: user_id
+        required: true
+        type: string
+      - description: Shopping Plan
+        in: body
+        name: plan
+        required: true
+        schema:
+          $ref: '#/definitions/models.ShoppingPlan'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ShoppingPlan'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create a shopping plan
+      tags:
+      - Shopping Plans
+  /shopping-plans/{id}:
+    delete:
+      description: Delete a shopping plan by ID
+      parameters:
+      - description: User ID
+        in: header
+        name: user_id
+        required: true
+        type: string
+      - description: Plan ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Delete a shopping plan
+      tags:
+      - Shopping Plans
+    get:
+      description: Retrieve a shopping plan using its ID
+      parameters:
+      - description: Plan ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ShoppingPlan'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get shopping plan by ID
+      tags:
+      - Shopping Plans
+    put:
+      consumes:
+      - application/json
+      description: Update a shopping plan details by ID
+      parameters:
+      - description: User ID
+        in: header
+        name: user_id
+        required: true
+        type: string
+      - description: Plan ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Shopping Plan
+        in: body
+        name: plan
+        required: true
+        schema:
+          $ref: '#/definitions/models.ShoppingPlan'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ShoppingPlan'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Update a shopping plan
+      tags:
+      - Shopping Plans
+  /shopping-plans/{id}/progress:
+    get:
+      description: Get progress status of a shopping plan
+      parameters:
+      - description: Plan ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema: {}
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get plan progress
+      tags:
+      - Shopping Plans
+  /shopping-plans/{id}/shops:
+    post:
+      consumes:
+      - application/json
+      description: Add a shop to an existing shopping plan
+      parameters:
+      - description: User ID
+        in: header
+        name: user_id
+        required: true
+        type: string
+      - description: Plan ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Shop ID payload
+        in: body
+        name: shop
+        required: true
+        schema:
+          additionalProperties:
+            type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/gin.H'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Add a shop to a plan
+      tags:
+      - Shopping Plans
+  /shopping-plans/{id}/shops/{shopId}:
+    delete:
+      description: Remove a shop from a shopping plan
+      parameters:
+      - description: User ID
+        in: header
+        name: user_id
+        required: true
+        type: string
+      - description: Plan ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Shop ID
+        in: path
+        name: shopId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/gin.H'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Remove a shop from a plan
+      tags:
+      - Shopping Plans
+  /shopping-plans/{id}/visit/{shopId}:
+    put:
+      description: Mark a shop as visited in a shopping plan
+      parameters:
+      - description: User ID
+        in: header
+        name: user_id
+        required: true
+        type: string
+      - description: Plan ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Shop ID
+        in: path
+        name: shopId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/gin.H'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Mark a shop as visited
+      tags:
+      - Shopping Plans
+  /shopping-plans/user/{id}:
+    get:
+      description: Retrieve all shopping plans associated with a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Requesting User ID
+        in: header
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get all plans of a user
+      tags:
+      - Shopping Plans
+  /shopping-plans/user/{id}/active:
+    get:
+      description: Get all active shopping plans for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Requesting User ID
+        in: header
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get active plans
+      tags:
+      - Shopping Plans
+  /shopping-plans/user/{id}/completed:
+    get:
+      description: Get all completed shopping plans for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Requesting User ID
+        in: header
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get completed plans
+      tags:
+      - Shopping Plans
+  /shopping-plans/user/{id}/stats:
+    get:
+      description: Get aggregated shopping plan stats for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Requesting User ID
+        in: header
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema: {}
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get user statistics
+      tags:
+      - Shopping Plans
+  /shops:
+    get:
+      description: Get all shops or search by category or query string
+      parameters:
+      - description: Shop category
+        in: query
+        name: category
+        type: string
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get shops
+      tags:
+      - Shops
+    post:
+      consumes:
+      - application/json
+      description: Create a new shop entry. Admin access only.
+      parameters:
+      - description: Shop data
+        in: body
+        name: shop
+        required: true
+        schema:
+          $ref: '#/definitions/models.Shop'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Shop'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create a new shop (admin)
+      tags:
+      - Shops
+  /shops/{id}:
+    delete:
+      description: Delete a shop by ID. Admin access only.
+      parameters:
+      - description: Shop ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Delete a shop (admin)
+      tags:
+      - Shops
+    get:
+      description: Get a single shop by its ID
+      parameters:
+      - description: Shop ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Shop'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get shop by ID
+      tags:
+      - Shops
+    put:
+      consumes:
+      - application/json
+      description: Update an existing shop by ID. Admin access only.
+      parameters:
+      - description: Shop ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated shop data
+        in: body
+        name: shop
+        required: true
+        schema:
+          $ref: '#/definitions/models.Shop'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Shop'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Update shop (admin)
+      tags:
+      - Shops
+  /shops/brand/{brand}:
+    get:
+      description: Get all shops that belong to a specific brand
+      parameters:
+      - description: Brand name
+        in: path
+        name: brand
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get shops by brand
+      tags:
+      - Shops
+  /shops/categories:
+    get:
+      description: Returns a list of predefined shop categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get shop categories
+      tags:
+      - Shops
+  /shops/nearby:
+    get:
+      description: Retrieve shops within a radius of the given latitude and longitude
+      parameters:
+      - description: Latitude
+        in: query
+        name: lat
+        required: true
+        type: number
+      - description: Longitude
+        in: query
+        name: lng
+        required: true
+        type: number
+      - description: 'Search radius in meters (default: 1000)'
+        in: query
+        name: radius
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get nearby shops
+      tags:
+      - Shops
+  /user/{id}:
+    delete:
+      description: Deletes a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete user
+      tags:
+      - user
+    get:
+      description: Retrieves user information
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get user by ID
+      tags:
+      - user
+    put:
+      consumes:
+      - application/json
+      description: Updates user name and email
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User update payload
+        in: body
+        name: user
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update user
+      tags:
+      - user
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates user and returns JWT
+      parameters:
+      - description: User login payload
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login a user
+      tags:
+      - user
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user account
+      parameters:
+      - description: User registration payload
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new user
+      tags:
+      - user
+schemes:
+- http
+swagger: "2.0"

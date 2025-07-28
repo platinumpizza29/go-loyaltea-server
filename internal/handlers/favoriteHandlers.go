@@ -18,7 +18,6 @@ func NewFavoriteHandler(favService *services.FavoriteService) *FavoriteHandler {
 	}
 }
 
-// AddFavorite adds a favorite to the user's list of favorites.
 func (h *FavoriteHandler) CreateFav(c *gin.Context) {
 	var favorite *models.Favorite
 	if err := c.ShouldBindJSON(&favorite); err != nil {
@@ -32,7 +31,6 @@ func (h *FavoriteHandler) CreateFav(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "Favorite added successfully"})
 }
 
-// RemoveFavorite removes a favorite from the user's list of favorites.
 func (h *FavoriteHandler) DeleteFav(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.favService.RemoveUserFavorite(id); err != nil {
@@ -42,7 +40,6 @@ func (h *FavoriteHandler) DeleteFav(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Favorite removed successfully"})
 }
 
-// GetFavorites returns the list of favorites for a user.
 func (h *FavoriteHandler) GetFav(c *gin.Context) {
 	userID := c.Param("id")
 	favorites, err := h.favService.GetFavorites(userID)
@@ -57,7 +54,7 @@ func (h *FavoriteHandler) UpdateFav(c *gin.Context) {
 	c.JSON(http.StatusNotImplemented, gin.H{"error": "Update favorite not implemented"})
 }
 
-// ClearFavorites clears all favorites for a user.
+// Todo: Implement ClearUserFavorites
 func (h *FavoriteHandler) ClearUserFavorites(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.favService.RemoveUserFavorite(id); err != nil {

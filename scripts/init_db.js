@@ -5,45 +5,41 @@
 // use loyaltea
 
 // Create geospatial index for shops collection to enable location-based queries
-db.shops.createIndex({ "location": "2dsphere" });
+db.shops.createIndex({ location: "2dsphere" });
 
 // Create compound index for shops filtering
-db.shops.createIndex({ "category": 1, "is_active": 1 });
-db.shops.createIndex({ "brand": 1, "is_active": 1 });
-db.shops.createIndex({ "is_active": 1, "created_at": -1 });
+db.shops.createIndex({ category: 1, is_active: 1 });
+db.shops.createIndex({ brand: 1, is_active: 1 });
+db.shops.createIndex({ is_active: 1, created_at: -1 });
 
 // Create text index for shop search functionality
 db.shops.createIndex({
-    "name": "text",
-    "brand": "text",
-    "address": "text"
+  name: "text",
+  brand: "text",
+  address: "text",
 });
 
 // Create indexes for shopping_plans collection
-db.shopping_plans.createIndex({ "user_id": 1 });
-db.shopping_plans.createIndex({ "user_id": 1, "is_completed": 1 });
-db.shopping_plans.createIndex({ "user_id": 1, "created_at": -1 });
+db.shopping_plans.createIndex({ user_id: 1 });
+db.shopping_plans.createIndex({ user_id: 1, is_completed: 1 });
+db.shopping_plans.createIndex({ user_id: 1, created_at: -1 });
 
 // Create compound index for plan stops
 db.shopping_plans.createIndex({ "stops.shop_id": 1 });
 db.shopping_plans.createIndex({ "stops.is_visited": 1 });
 
 // Create indexes for users collection
-db.users.createIndex({ "email": 1 }, { unique: true });
-db.users.createIndex({ "total_points": -1 });
+db.users.createIndex({ email: 1 }, { unique: true });
+db.users.createIndex({ total_points: -1 });
 
 // Create indexes for existing collections if they don't exist
-db.offers.createIndex({ "sender_email": 1 });
-db.offers.createIndex({ "brand": 1 });
-db.offers.createIndex({ "createdAt": -1 });
+db.offers.createIndex({ sender_email: 1 });
+db.offers.createIndex({ brand: 1 });
+db.offers.createIndex({ createdAt: -1 });
 
-db.favorites.createIndex({ "user_id": 1 });
-db.favorites.createIndex({ "offer_id": 1 });
-db.favorites.createIndex({ "user_id": 1, "offer_id": 1 }, { unique: true });
-
-db.planner.createIndex({ "user_id": 1 });
-db.planner.createIndex({ "location": "2dsphere" });
-db.planner.createIndex({ "user_id": 1, "isCompleted": 1 });
+db.favorites.createIndex({ user_id: 1 });
+db.favorites.createIndex({ offer_id: 1 });
+db.favorites.createIndex({ user_id: 1, offer_id: 1 }, { unique: true });
 
 print("Database indexes created successfully!");
 
@@ -136,35 +132,43 @@ print("\n=== Testing Indexes ===");
 
 // Test geospatial query
 print("Testing nearby shops query...");
-var nearbyShops = db.shops.find({
-    "location": {
-        "$near": {
-            "$geometry": {
-                "type": "Point",
-                "coordinates": [-74.0060, 40.7128]
-            },
-            "$maxDistance": 1000
-        }
+var nearbyShops = db.shops
+  .find({
+    location: {
+      $near: {
+        $geometry: {
+          type: "Point",
+          coordinates: [-74.006, 40.7128],
+        },
+        $maxDistance: 1000,
+      },
     },
-    "is_active": true
-}).limit(5);
+    is_active: true,
+  })
+  .limit(5);
 
-print("Nearby shops query executed successfully. Count: " + nearbyShops.count());
+print(
+  "Nearby shops query executed successfully. Count: " + nearbyShops.count(),
+);
 
 // Test category filtering
 print("Testing category filtering...");
 var coffeeShops = db.shops.find({
-    "category": "coffee",
-    "is_active": true
+  category: "coffee",
+  is_active: true,
 });
-print("Coffee shops query executed successfully. Count: " + coffeeShops.count());
+print(
+  "Coffee shops query executed successfully. Count: " + coffeeShops.count(),
+);
 
 // Test text search
 print("Testing text search...");
 var searchResults = db.shops.find({
-    "$text": { "$search": "coffee" },
-    "is_active": true
+  $text: { $search: "coffee" },
+  is_active: true,
 });
-print("Text search query executed successfully. Count: " + searchResults.count());
+print(
+  "Text search query executed successfully. Count: " + searchResults.count(),
+);
 
 print("\n=== Database initialization completed! ===");

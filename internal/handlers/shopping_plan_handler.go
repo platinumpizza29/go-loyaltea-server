@@ -16,7 +16,19 @@ func NewShoppingPlanHandler(planService *services.ShoppingPlanService) *Shopping
 	return &ShoppingPlanHandler{planService: planService}
 }
 
-// POST /shopping-plans
+// CreatePlan godoc
+// @Summary Create a shopping plan
+// @Description Create a new shopping plan for a user
+// @Tags Shopping Plans
+// @Accept json
+// @Produce json
+// @Param user_id header string true "User ID"
+// @Param plan body models.ShoppingPlan true "Shopping Plan"
+// @Success 201 {object} models.ShoppingPlan
+// @Failure 400 {object} gin.H
+// @Failure 401 {object} gin.H
+// @Failure 500 {object} gin.H
+// @Router /shopping-plans [post]
 func (h *ShoppingPlanHandler) CreatePlan(ctx *gin.Context) {
 	userID := ctx.GetHeader("user_id")
 	if userID == "" {
@@ -40,7 +52,16 @@ func (h *ShoppingPlanHandler) CreatePlan(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, plan)
 }
 
-// GET /shopping-plans/:id
+// GetPlanByID godoc
+// @Summary Get shopping plan by ID
+// @Description Retrieve a shopping plan using its ID
+// @Tags Shopping Plans
+// @Produce json
+// @Param id path string true "Plan ID"
+// @Success 200 {object} models.ShoppingPlan
+// @Failure 400 {object} gin.H
+// @Failure 404 {object} gin.H
+// @Router /shopping-plans/{id} [get]
 func (h *ShoppingPlanHandler) GetPlanByID(ctx *gin.Context) {
 	planID := ctx.Param("id")
 	if planID == "" {
@@ -57,7 +78,17 @@ func (h *ShoppingPlanHandler) GetPlanByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, plan)
 }
 
-// GET /shopping-plans/user/:id
+// GetUserPlans godoc
+// @Summary Get all plans of a user
+// @Description Retrieve all shopping plans associated with a user
+// @Tags Shopping Plans
+// @Produce json
+// @Param id path string true "User ID"
+// @Param user_id header string true "Requesting User ID"
+// @Success 200 {object} gin.H
+// @Failure 400 {object} gin.H
+// @Failure 403 {object} gin.H
+// @Router /shopping-plans/user/{id} [get]
 func (h *ShoppingPlanHandler) GetUserPlans(ctx *gin.Context) {
 	userID := ctx.Param("id")
 	if userID == "" {
@@ -84,7 +115,17 @@ func (h *ShoppingPlanHandler) GetUserPlans(ctx *gin.Context) {
 	})
 }
 
-// GET /shopping-plans/user/:id/active
+// GetActivePlans godoc
+// @Summary Get active plans
+// @Description Get all active shopping plans for a user
+// @Tags Shopping Plans
+// @Produce json
+// @Param id path string true "User ID"
+// @Param user_id header string true "Requesting User ID"
+// @Success 200 {object} gin.H
+// @Failure 400 {object} gin.H
+// @Failure 403 {object} gin.H
+// @Router /shopping-plans/user/{id}/active [get]
 func (h *ShoppingPlanHandler) GetActivePlans(ctx *gin.Context) {
 	userID := ctx.Param("id")
 	if userID == "" {
@@ -111,7 +152,17 @@ func (h *ShoppingPlanHandler) GetActivePlans(ctx *gin.Context) {
 	})
 }
 
-// GET /shopping-plans/user/:id/completed
+// GetCompletedPlans godoc
+// @Summary Get completed plans
+// @Description Get all completed shopping plans for a user
+// @Tags Shopping Plans
+// @Produce json
+// @Param id path string true "User ID"
+// @Param user_id header string true "Requesting User ID"
+// @Success 200 {object} gin.H
+// @Failure 400 {object} gin.H
+// @Failure 403 {object} gin.H
+// @Router /shopping-plans/user/{id}/completed [get]
 func (h *ShoppingPlanHandler) GetCompletedPlans(ctx *gin.Context) {
 	userID := ctx.Param("id")
 	if userID == "" {
@@ -138,7 +189,20 @@ func (h *ShoppingPlanHandler) GetCompletedPlans(ctx *gin.Context) {
 	})
 }
 
-// PUT /shopping-plans/:id
+// UpdatePlan godoc
+// @Summary Update a shopping plan
+// @Description Update a shopping plan details by ID
+// @Tags Shopping Plans
+// @Accept json
+// @Produce json
+// @Param user_id header string true "User ID"
+// @Param id path string true "Plan ID"
+// @Param plan body models.ShoppingPlan true "Shopping Plan"
+// @Success 200 {object} models.ShoppingPlan
+// @Failure 400 {object} gin.H
+// @Failure 401 {object} gin.H
+// @Failure 500 {object} gin.H
+// @Router /shopping-plans/{id} [put]
 func (h *ShoppingPlanHandler) UpdatePlan(ctx *gin.Context) {
 	userID := ctx.GetHeader("user_id")
 	if userID == "" {
@@ -169,7 +233,18 @@ func (h *ShoppingPlanHandler) UpdatePlan(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, plan)
 }
 
-// DELETE /shopping-plans/:id
+// DeletePlan godoc
+// @Summary Delete a shopping plan
+// @Description Delete a shopping plan by ID
+// @Tags Shopping Plans
+// @Produce json
+// @Param user_id header string true "User ID"
+// @Param id path string true "Plan ID"
+// @Success 200 {object} gin.H
+// @Failure 400 {object} gin.H
+// @Failure 401 {object} gin.H
+// @Failure 500 {object} gin.H
+// @Router /shopping-plans/{id} [delete]
 func (h *ShoppingPlanHandler) DeletePlan(ctx *gin.Context) {
 	userID := ctx.GetHeader("user_id")
 	if userID == "" {
@@ -191,7 +266,20 @@ func (h *ShoppingPlanHandler) DeletePlan(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "Plan deleted successfully"})
 }
 
-// PUT /shopping-plans/:id/visit/:shopId
+// MarkShopVisited godoc
+// @Summary Mark a shop as visited
+// @Description Mark a shop as visited in a shopping plan
+// @Tags Shopping Plans
+// @Produce json
+// @Param user_id header string true "User ID"
+// @Param id path string true "Plan ID"
+// @Param shopId path string true "Shop ID"
+// @Success 200 {object} gin.H
+// @Failure 400 {object} gin.H
+// @Failure 401 {object} gin.H
+// @Failure 403 {object} gin.H
+// @Failure 500 {object} gin.H
+// @Router /shopping-plans/{id}/visit/{shopId} [put]
 func (h *ShoppingPlanHandler) MarkShopVisited(ctx *gin.Context) {
 	userID := ctx.GetHeader("user_id")
 	if userID == "" {
@@ -222,7 +310,22 @@ func (h *ShoppingPlanHandler) MarkShopVisited(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "Shop marked as visited and points awarded"})
 }
 
-// POST /shopping-plans/:id/shops
+// AddShopToPlan godoc
+// @Summary Add a shop to a plan
+// @Description Add a shop to an existing shopping plan
+// @Tags Shopping Plans
+// @Accept json
+// @Produce json
+// @Param user_id header string true "User ID"
+// @Param id path string true "Plan ID"
+// @Param shop body map[string]string true "Shop ID payload"
+// @Success 200 {object} gin.H
+// @Failure 400 {object} gin.H
+// @Failure 401 {object} gin.H
+// @Failure 403 {object} gin.H
+// @Failure 404 {object} gin.H
+// @Failure 500 {object} gin.H
+// @Router /shopping-plans/{id}/shops [post]
 func (h *ShoppingPlanHandler) AddShopToPlan(ctx *gin.Context) {
 	userID := ctx.GetHeader("user_id")
 	if userID == "" {
@@ -267,7 +370,20 @@ func (h *ShoppingPlanHandler) AddShopToPlan(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "Shop added to plan successfully"})
 }
 
-// DELETE /shopping-plans/:id/shops/:shopId
+// RemoveShopFromPlan godoc
+// @Summary Remove a shop from a plan
+// @Description Remove a shop from a shopping plan
+// @Tags Shopping Plans
+// @Produce json
+// @Param user_id header string true "User ID"
+// @Param id path string true "Plan ID"
+// @Param shopId path string true "Shop ID"
+// @Success 200 {object} gin.H
+// @Failure 400 {object} gin.H
+// @Failure 401 {object} gin.H
+// @Failure 403 {object} gin.H
+// @Failure 500 {object} gin.H
+// @Router /shopping-plans/{id}/shops/{shopId} [delete]
 func (h *ShoppingPlanHandler) RemoveShopFromPlan(ctx *gin.Context) {
 	userID := ctx.GetHeader("user_id")
 	if userID == "" {
@@ -298,7 +414,16 @@ func (h *ShoppingPlanHandler) RemoveShopFromPlan(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "Shop removed from plan successfully"})
 }
 
-// GET /shopping-plans/:id/progress
+// GetPlanProgress godoc
+// @Summary Get plan progress
+// @Description Get progress status of a shopping plan
+// @Tags Shopping Plans
+// @Produce json
+// @Param id path string true "Plan ID"
+// @Success 200 {object} interface{}
+// @Failure 400 {object} gin.H
+// @Failure 500 {object} gin.H
+// @Router /shopping-plans/{id}/progress [get]
 func (h *ShoppingPlanHandler) GetPlanProgress(ctx *gin.Context) {
 	planID := ctx.Param("id")
 	if planID == "" {
@@ -315,7 +440,18 @@ func (h *ShoppingPlanHandler) GetPlanProgress(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, progress)
 }
 
-// GET /shopping-plans/user/:id/stats
+// GetUserStats godoc
+// @Summary Get user statistics
+// @Description Get aggregated shopping plan stats for a user
+// @Tags Shopping Plans
+// @Produce json
+// @Param id path string true "User ID"
+// @Param user_id header string true "Requesting User ID"
+// @Success 200 {object} interface{}
+// @Failure 400 {object} gin.H
+// @Failure 403 {object} gin.H
+// @Failure 500 {object} gin.H
+// @Router /shopping-plans/user/{id}/stats [get]
 func (h *ShoppingPlanHandler) GetUserStats(ctx *gin.Context) {
 	userID := ctx.Param("id")
 	if userID == "" {

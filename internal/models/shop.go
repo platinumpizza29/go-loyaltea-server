@@ -2,6 +2,11 @@ package models
 
 import "time"
 
+type GeoPoint struct {
+	Type        string    `bson:"type" json:"type"`
+	Coordinates []float64 `bson:"coordinates" json:"coordinates"`
+}
+
 type Shop struct {
 	ID          string    `bson:"_id,omitempty" json:"id"`
 	Name        string    `bson:"name" json:"name"`

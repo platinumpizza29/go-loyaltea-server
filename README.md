@@ -23,9 +23,7 @@ A comprehensive loyalty and shopping management system built with Go, Gin, and M
 - **Points accumulation** - Automatic point tracking across all visits
 - **Personal dashboard** - View total points, completed plans, and visit history
 
-### 🗺️ Legacy Planner Support
-- **Backward compatibility** - Maintains existing planner functionality
-- **Custom stops** - Add personal stops with custom locations and points
+
 
 ## Tech Stack
 
@@ -174,7 +172,7 @@ loyaltea/
 │   │   ├── user.go
 │   │   ├── shop.go
 │   │   ├── shopping_plan.go
-│   │   ├── planner.go     # Legacy planner
+
 │   │   ├── offer.go
 │   │   └── favorite.go
 │   ├── db/                # Database layer
@@ -226,7 +224,7 @@ The system uses MongoDB's geospatial capabilities to find shops within a specifi
 4. **Completion**: All shops visited, plan marked as completed
 
 ### Legacy Compatibility
-The system maintains backward compatibility with the existing planner system while adding new shopping plan functionality.
+The system provides comprehensive shopping plan functionality with geospatial search capabilities.
 
 ## Development
 
