@@ -3,6 +3,11 @@ definitions:
   gin.H:
     additionalProperties: {}
     type: object
+  handlers.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
   handlers.LoginRequest:
     properties:
       email:
@@ -26,6 +31,15 @@ definitions:
     - email
     - name
     - password
+    type: object
+  handlers.ShopIDsRequest:
+    properties:
+      ids:
+        items:
+          type: string
+        type: array
+    required:
+    - ids
     type: object
   models.GeoPoint:
     properties:
@@ -776,6 +790,39 @@ paths:
           schema:
             $ref: '#/definitions/gin.H'
       summary: Update shop (admin)
+      tags:
+      - Shops
+  /shops/batch:
+    post:
+      consumes:
+      - application/json
+      description: Fetch a batch of shop documents based on provided comma-separated
+        shop IDs
+      parameters:
+      - description: List of shop IDs
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ShopIDsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Shop'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Get shops by a list of IDs
       tags:
       - Shops
   /shops/brand/{brand}:

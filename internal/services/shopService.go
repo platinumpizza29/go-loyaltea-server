@@ -70,6 +70,10 @@ func (s *ShopService) SearchShops(ctx context.Context, query string) ([]*models.
 	return s.shopDb.SearchShops(ctx, query)
 }
 
+func (s *ShopService) GetShopsByIDs(ctx context.Context, shopIDs []string) ([]models.Shop, error) {
+	return s.shopDb.GetShopsByIDs(ctx, shopIDs)
+}
+
 // ValidateShopData validates shop data before creation/update
 func (s *ShopService) ValidateShopData(shop *models.Shop) error {
 	if shop.Name == "" {

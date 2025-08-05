@@ -107,6 +107,7 @@ func main() {
 		shopRoutes.POST("/", shopHandler.CreateShop)      // Admin only
 		shopRoutes.PUT("/:id", shopHandler.UpdateShop)    // Admin only
 		shopRoutes.DELETE("/:id", shopHandler.DeleteShop) // Admin only
+		shopRoutes.POST("/batch", shopHandler.GetShopsBatchHandler)
 	}
 
 	// shopping plan routes

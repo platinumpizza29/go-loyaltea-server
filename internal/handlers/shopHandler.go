@@ -284,3 +284,37 @@ func (h *ShopHandler) GetCategories(ctx *gin.Context) {
 		"categories": categories,
 	})
 }
+
+type ShopIDsRequest struct {
+	IDs []string `json:"ids" binding:"required"`
+}
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
+// GetShopsBatchHandler godoc
+// @Summary      Get shops by a list of IDs
+// @Description  Fetch a batch of shop documents based on provided comma-separated shop IDs
+// @Tags         Shops
+// @Accept       json
+// @Produce      json
+// @Param        body  body      ShopIDsRequest  true  "List of shop IDs"
+// @Success      200   {array}   models.Shop
+// @Failure      400   {object}  ErrorResponse
+// @Failure      500   {object}  ErrorResponse
+// @Router       /shops/batch [post]
+func (h *ShopHandler) GetShopsBatchHandler(ctx *gin.Context) {
+	var req ShopIDsRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid request payload, expected JSON with 'ids'"})
+		return
+	}
+
+	shops, err := h.shopService.GetShopsByIDs(ctx.Request.Context(), req.IDs)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Failed to fetch shops"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, shops)
+}

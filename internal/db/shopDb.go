@@ -134,3 +134,25 @@ func (s *ShopModel) SearchShops(ctx context.Context, query string) ([]*models.Sh
 
 	return shops, nil
 }
+
+func (s *ShopModel) GetShopsByIDs(ctx context.Context, shopIDs []string) ([]models.Shop, error) {
+	shopCollection := s.collection
+
+	filter := bson.M{"_id": bson.M{"$in": shopIDs}} // no conversion needed
+	cursor, err := shopCollection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var shops []models.Shop
+	if err := cursor.All(ctx, &shops); err != nil {
+		return nil, err
+	}
+
+	if shops == nil {
+		shops = []models.Shop{}
+	}
+
+	return shops, nil
+}
